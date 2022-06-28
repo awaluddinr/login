@@ -1,6 +1,28 @@
 <?php
 
 
+$conn = mysqli_connect("localhost", "root", "", "phpdasar");
+
+if (isset($_POST['kirim'])) {
+    $nama = $_POST['email'];
+    $pass = $_POST['pass'];
+
+    $query = "SELECT * FROM login WHERE nama = '$nama' and pass = '$pass'";
+    $result = mysqli_query($conn, $query);
+
+
+    if (mysqli_num_rows($result) == 1) {
+        $row = mysqli_fetch_assoc($result);
+        $role = $row['role'];
+
+        if ($nama == 'awal') {
+            header('Location : admin.php');
+        } elseif ($nama == 'rajab') {
+            header('Location : index.php');
+        }
+    }
+}
+
 
 
 ?>
@@ -19,14 +41,17 @@
 </head>
 
 <body>
-    <div class="container d-flex align-items-center" style="min-height: 100vh;">
+    <div class="container col-lg-6 d-flex" style="min-height: 100vh;">
 
-        <div class="col-12">
+        <div class="col-12 my-auto">
 
-            <form method="POST" class="my-auto" style="min-height: 100vh;">
+            <form method="POST" class="col-12">
+
+                <h2 class="text-center">Login</h2>
+
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label for="exampleInputEmail1 " class="form-label">Email address</label>
+                    <input type="text" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Password</label>
