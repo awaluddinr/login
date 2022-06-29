@@ -1,3 +1,16 @@
+<?php
+
+session_start();
+$conn = mysqli_connect('localhost', 'root', '', 'phpdasar');
+if (!isset($_SESSION["login"])) {
+    header('Location: login.php');
+    exit;
+}
+
+
+
+
+?>
 <!doctype html>
 <html lang="en">
 

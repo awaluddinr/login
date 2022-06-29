@@ -1,26 +1,54 @@
 <?php
 
-
-$conn = mysqli_connect("localhost", "root", "", "phpdasar");
+session_start();
+if (isset($_SESSION['login'])) {
+    if ($_SESSION['auth_role'] == '1' && (!$_SESSION['user'])) {
+        header('Location: admin.php');
+    } elseif ($_SESSION['auth_role'] == '0' && (!isset($_SESSION['admin']))) {
+        header('Location: index.php');
+    }
+}
+$conn = mysqli_connect('localhost', 'root', '', 'phpdasar');
 
 if (isset($_POST['kirim'])) {
-    $nama = $_POST['email'];
-    $pass = $_POST['pass'];
+    $nama = mysqli_escape_string($conn, $_POST['email']);
+    $pass = mysqli_escape_string($conn, $_POST['pass']);
 
-    $query = "SELECT * FROM login WHERE nama = '$nama' and pass = '$pass'";
+    $query = "SELECT * FROM login1 WHERE email = '$nama' AND pass = '$pass'";
     $result = mysqli_query($conn, $query);
 
 
-    if (mysqli_num_rows($result) == 1) {
-        $row = mysqli_fetch_assoc($result);
-        $role = $row['role'];
+    if (mysqli_num_rows($result) > 0) {
 
-        if ($nama == 'awal') {
-            header('Location : admin.php');
-        } elseif ($nama == 'rajab') {
-            header('Location : index.php');
+        foreach ($result as $data) {
+            $id = $data['id'];
+            $nama = $data['nama'];
+            $email = $data['email'];
+            $role = $data['role'];
         }
+
+        $_SESSION['auth_role'] = "$role";
+        $_SESSION['loginData'] = [
+            'id' => $id,
+            'nama' => $nama,
+            'email' => $email,
+        ];
+
+
+        if ($_SESSION['auth_role'] == '1') {
+            header('Location: admin.php');
+            $_SESSION['login'] = true;
+            $_SESSION['admin'] = true;
+        } elseif ($_SESSION['auth_role'] == '0') {
+            header('Location: index.php');
+            $_SESSION['user'] = true;
+            $_SESSION['login'] = true;
+        }
+    } else {
+        $error = true;
     }
+} else {
+    $not = "tidak boleh masuk sini";
 }
 
 
@@ -50,12 +78,18 @@ if (isset($_POST['kirim'])) {
                 <h2 class="text-center">Login</h2>
 
                 <div class="mb-3">
+                    <?php if (isset($error)) : ?>
+                        <h3 class="text-danger">Email tidak dikenali</h3>
+                    <?php endif; ?>
+                </div>
+
+                <div class="mb-3">
                     <label for="exampleInputEmail1 " class="form-label">Email address</label>
-                    <input type="text" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" autocomplete="off">
+                    <input type="email" name="email" class="form-control" autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" name="pass" class="form-control" id="exampleInputPassword1">
+                    <input type="password" name="pass" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary" name="kirim">Submit</button>
             </form>
